@@ -38,63 +38,38 @@ const CalculatorForm = ({
     handleSubmit,
     formState: { errors },
     watch,
+    setValue,
     getValues,
-  } = useForm({
+  } = useForm<TFormState>({
     resolver: yupResolver(generateValidationSchema()),
     defaultValues: generateInitialValues(selectedSystemTypeData),
   });
-  // const [formData, setFormData] = useState(
-  //   generateInitialValues(selectedSystemTypeData)
-  // );
 
-  
   const currentName = watch("events");
   console.log(currentName, errors);
 
   const onSubmit = () => {
     if (!!errors) return errors;
-    console.log("events", events);
+
     const data = analyseAndCalculateCombinations(
       events,
       parseSystemType(systemType).pick,
       totalStake
     );
+    console.log("data", data);
+
     setTableData(data);
   };
 
   const handleSelectChange = (
     event: ChangeEvent<HTMLSelectElement & HTMLInputElement>
   ) => {
-    register("systemType").onChange(event);
-
     setSelectedSystemTypeData(parseSystemType(event.target.value));
     setTableData(undefined);
-    // setFormData((prev) => ({
-    //   ...prev,
-    //   events: generateInitialEvents(parseSystemType(event.target.value).from),
-    // }));
-
-    // console.log("event3", events, parseSystemType(event.target.value).from);
-  };
-
-  const handleChangeEvent = (event: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-
-    console.log("3333333", name, value);
-    const [index, fieldName] = name.split("[");
-    const numbericIndex = Number(index);
-    // console.log("eventsind", events[numbericIndex]);
-
-    // setFormData((prev) => ({
-    //   ...prev,
-    //   events: events.with(numbericIndex, {
-    //     ...events[numbericIndex],
-    //     [fieldName]: value ? parseFloat(value) : 0,
-    //   }),
-    // }));
-
-    // console.log("event3", events, parseSystemType(event.target.value).from);
-    console.log("event222", events);
+    setValue(
+      "events",
+      generateInitialEvents(parseSystemType(event.target.value).from)
+    );
   };
 
   const { systemType, events, totalStake } = getValues();
@@ -123,9 +98,11 @@ const CalculatorForm = ({
             {...register("totalStake")}
             name="totalStake"
             type="number"
-            defaultValue={100}
+            // defaultValue={100}
           />
-          {errors.totalStake && <div className="error-message">uuuuuuu</div>}
+          {errors.totalStake && (
+            <div className="error-message">{errors.totalStake}</div>
+          )}
         </div>
         <div>
           {events.map(({ id, rate }, i) => (
@@ -134,41 +111,34 @@ const CalculatorForm = ({
                 <label htmlFor={id}>{`Event ${i + 1}`} </label>
                 <input
                   id={id}
-                  {...register(`events.[${i}].rate`)}
-                  // name={`${name}.rate`}
+                  {...register(`events.${i}.rate`)}
                   type="number"
                   step="0.01"
-                  defaultValue={rate?.toFixed(2)}
-                  // onChange={handleChangeEvent}
+                  defaultValue={Number(rate).toFixed(2)}
                 />
                 <input
                   id={`win-${id}`}
-                  {...register(`events.[${i}].status`)}
-                  // name={`${name}.status`}
+                  {...register(`events.${i}.status`)}
                   type="radio"
                   defaultChecked
                   value={EStatus.WIN}
-                  // onChange={handleChangeEvent}
                 />
                 <input
                   id={`lose-${id}`}
-                  {...register(`events.[${i}].status`)}
-                  // name={`${name}.status`}
+                  {...register(`events.${i}.status`)}
                   type="radio"
                   value={EStatus.LOSE}
-                  // onChange={handleChangeEvent}
                 />
                 <input
                   id={`draw-${id}`}
-                  {...register(`events.[${i}].status`)}
+                  {...register(`events.${i}.status`)}
                   type="radio"
                   value={EStatus.DRAW}
-                  // onChange={handleChangeEvent}
                 />
               </div>
-              {/* {errors.events && (
+              {errors.events && (
                 <div className="error-message">{errors.events}</div>
-              )} */}
+              )}
             </Fragment>
           ))}
         </div>
