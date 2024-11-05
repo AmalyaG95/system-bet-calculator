@@ -1,13 +1,18 @@
 "use client";
 
-import React, { ChangeEvent, Dispatch, Fragment, SetStateAction } from "react";
+import React, {
+  ChangeEvent,
+  Dispatch,
+  Fragment,
+  SetStateAction,
+  useState,
+} from "react";
 
 import analyseAndCalculateCombinations from "@/utils/analyseAndCalculateCombinations/analyseAndCalculateCombinations";
 import generateInitialEvents, {
   EStatus,
 } from "@/utils/generateInitialEvents/generateInitialEvents";
-// import useForm from "@/hooks/use-form";
-import useForm from "react-hook-form";
+import { useForm } from "react-hook-form";
 import systemTypes from "@/utils/generateBetSystemTypes/generateBetSystemTypes";
 import { parseSystemType } from "@/utils";
 import {
@@ -15,6 +20,7 @@ import {
   generateValidationSchema,
   TFormState,
 } from "./model";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 type CalculatorFormProps = {
   selectedSystemTypeData: TSystemTypeData;
@@ -27,24 +33,34 @@ const CalculatorForm = ({
   setTableData,
   setSelectedSystemTypeData,
 }: CalculatorFormProps) => {
-  const { formData, setFormData, errors, register, formAction, pending } =
-    useForm<TFormState>(
-      async (_, errors) => {
-        // if (!!errors) return errors;
-        console.log("events", events);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+    getValues,
+  } = useForm({
+    resolver: yupResolver(generateValidationSchema()),
+    defaultValues: generateInitialValues(selectedSystemTypeData),
+  });
+  // const [formData, setFormData] = useState(
+  //   generateInitialValues(selectedSystemTypeData)
+  // );
 
-        const data = analyseAndCalculateCombinations(
-          events,
-          parseSystemType(systemType).pick,
-          totalStake
-        );
+  
+  const currentName = watch("events");
+  console.log(currentName, errors);
 
-        setTableData(data);
-        return formData;
-      },
-      generateInitialValues(selectedSystemTypeData),
-      generateValidationSchema()
+  const onSubmit = () => {
+    if (!!errors) return errors;
+    console.log("events", events);
+    const data = analyseAndCalculateCombinations(
+      events,
+      parseSystemType(systemType).pick,
+      totalStake
     );
+    setTableData(data);
+  };
 
   const handleSelectChange = (
     event: ChangeEvent<HTMLSelectElement & HTMLInputElement>
@@ -53,37 +69,39 @@ const CalculatorForm = ({
 
     setSelectedSystemTypeData(parseSystemType(event.target.value));
     setTableData(undefined);
-    setFormData((prev) => ({
-      ...prev,
-      events: generateInitialEvents(parseSystemType(event.target.value).from),
-    }));
+    // setFormData((prev) => ({
+    //   ...prev,
+    //   events: generateInitialEvents(parseSystemType(event.target.value).from),
+    // }));
 
-    console.log("event3", events, parseSystemType(event.target.value).from);
+    // console.log("event3", events, parseSystemType(event.target.value).from);
   };
 
   const handleChangeEvent = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
 
     console.log("3333333", name, value);
-    const [index, fieldName] = name.split(".");
+    const [index, fieldName] = name.split("[");
     const numbericIndex = Number(index);
+    // console.log("eventsind", events[numbericIndex]);
 
-    setFormData((prev) => ({
-      ...prev,
-      events: events.with(numbericIndex, {
-        ...events[numbericIndex],
-        [fieldName]: value ? parseFloat(value) : 0,
-      }),
-    }));
+    // setFormData((prev) => ({
+    //   ...prev,
+    //   events: events.with(numbericIndex, {
+    //     ...events[numbericIndex],
+    //     [fieldName]: value ? parseFloat(value) : 0,
+    //   }),
+    // }));
 
-    console.log("event3", events, parseSystemType(event.target.value).from);
+    // console.log("event3", events, parseSystemType(event.target.value).from);
+    console.log("event222", events);
   };
 
-  const { systemType, events, totalStake } = formData;
+  const { systemType, events, totalStake } = getValues();
 
   return (
     <>
-      <form action={formAction}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <div>
           <label htmlFor="systemType">System Type</label>
           <select
@@ -107,9 +125,7 @@ const CalculatorForm = ({
             type="number"
             defaultValue={100}
           />
-          {errors.totalStake && (
-            <div className="error-message">{errors.totalStake}</div>
-          )}
+          {errors.totalStake && <div className="error-message">uuuuuuu</div>}
         </div>
         <div>
           {events.map(({ id, rate }, i) => (
@@ -118,48 +134,46 @@ const CalculatorForm = ({
                 <label htmlFor={id}>{`Event ${i + 1}`} </label>
                 <input
                   id={id}
-                  {...register(`events.${i}.rate` as Path<TFormState>)}
+                  {...register(`events.[${i}].rate`)}
                   // name={`${name}.rate`}
                   type="number"
                   step="0.01"
-                  defaultValue={rate.toFixed(2)}
-                  onChange={handleChangeEvent}
+                  defaultValue={rate?.toFixed(2)}
+                  // onChange={handleChangeEvent}
                 />
                 <input
                   id={`win-${id}`}
-                  {...register(`${i}.status`)}
+                  {...register(`events.[${i}].status`)}
                   // name={`${name}.status`}
                   type="radio"
                   defaultChecked
                   value={EStatus.WIN}
-                  onChange={handleChangeEvent}
+                  // onChange={handleChangeEvent}
                 />
                 <input
                   id={`lose-${id}`}
-                  {...register(`${i}.status`)}
+                  {...register(`events.[${i}].status`)}
                   // name={`${name}.status`}
                   type="radio"
                   value={EStatus.LOSE}
-                  onChange={handleChangeEvent}
+                  // onChange={handleChangeEvent}
                 />
                 <input
                   id={`draw-${id}`}
-                  {...register(`${i}.status`)}
+                  {...register(`events.[${i}].status`)}
                   type="radio"
                   value={EStatus.DRAW}
-                  onChange={handleChangeEvent}
+                  // onChange={handleChangeEvent}
                 />
               </div>
-              {errors.events && (
+              {/* {errors.events && (
                 <div className="error-message">{errors.events}</div>
-              )}
+              )} */}
             </Fragment>
           ))}
         </div>
 
-        <button type="submit" disabled={pending}>
-          Analyse
-        </button>
+        <button type="submit">Analyse</button>
       </form>
     </>
   );

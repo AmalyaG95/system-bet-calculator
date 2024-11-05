@@ -24,7 +24,7 @@ const Row = ({ index, id, events, winningAmount }: RowProps) => {
               : "text-slate-400"
           }`}
         >
-          {rate.toFixed(2)}
+          {rate?.toFixed(2)}
         </span>
       ))}
       <span className=" w-48 text-center">{getTotalRate(events)}</span>
