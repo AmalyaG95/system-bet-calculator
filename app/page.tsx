@@ -11,8 +11,11 @@ const Home = () => {
     useState<TSystemTypeData>(systemTypes[0]);
 
   return (
-    <div>
-      <main>
+    <div className="min-h-screen bg-gradient-to-b from-blue-100 to-green-100">
+      <main className="flex flex-col gap-9 p-14">
+        <h1 className="text-4xl text-center font-bold bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 text-transparent bg-clip-text">
+          System Bet Calculator
+        </h1>
         <CalculatorForm
           selectedSystemTypeData={selectedSystemTypeData}
           setTableData={setTableData}
@@ -24,9 +27,15 @@ const Home = () => {
               combinations={tableData.combinations}
               pickNumber={selectedSystemTypeData.pick}
             />
-            <h1>Total winnings: {tableData.winningsTotalAmount}</h1>
-            <h1>Total stake: {tableData.stake}</h1>
-            <h1>Stake per Combination: {tableData.stakePerCombination}</h1>
+            <section className="flex flex-col gap-3 font-bold">
+              <h1 className="text-center">
+                Total winnings: {tableData.winningsTotalAmount}
+              </h1>
+              <h1 className="text-center">Total stake: {tableData.stake}</h1>
+              <h1 className="text-center">
+                Stake per Combination: {tableData.stakePerCombination}
+              </h1>
+            </section>
           </>
         )}
       </main>

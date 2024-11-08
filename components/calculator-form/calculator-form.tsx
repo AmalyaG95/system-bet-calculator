@@ -7,6 +7,7 @@ import React, {
   SetStateAction,
   useState,
 } from "react";
+// import { isNil, isObject } from "lodash";
 
 import analyseAndCalculateCombinations from "@/utils/analyseAndCalculateCombinations/analyseAndCalculateCombinations";
 import generateInitialEvents, {
@@ -21,6 +22,7 @@ import {
   TFormState,
 } from "./model";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { isNil } from "lodash";
 
 type CalculatorFormProps = {
   selectedSystemTypeData: TSystemTypeData;
@@ -45,11 +47,15 @@ const CalculatorForm = ({
     defaultValues: generateInitialValues(selectedSystemTypeData),
   });
 
-  const currentName = watch("events");
-  console.log(currentName, errors);
+  const eventsV = watch("events");
+  const totalStakeV = watch("totalStake");
+  console.log(eventsV, "yyyyyy");
+  console.log(totalStakeV, "totalStakeV");
 
   const onSubmit = () => {
-    if (!!errors) return errors;
+    console.log(111111, errors);
+
+    if (isNil(errors)) return errors;
 
     const data = analyseAndCalculateCombinations(
       events,
@@ -76,10 +82,11 @@ const CalculatorForm = ({
 
   return (
     <>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div>
+      <form className="container" onSubmit={handleSubmit(onSubmit)}>
+        <div className="flex items-center">
           <label htmlFor="systemType">System Type</label>
           <select
+            className="block w-full px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             id="systemType"
             {...register("systemType")}
             onChange={handleSelectChange}
@@ -92,7 +99,7 @@ const CalculatorForm = ({
             ))}
           </select>
         </div>
-        <div>
+        <div className="flex items-center">
           <label htmlFor="totalStake">Total Stake</label>
           <input
             {...register("totalStake")}
@@ -104,10 +111,10 @@ const CalculatorForm = ({
             <div className="error-message">{errors.totalStake}</div>
           )}
         </div>
-        <div>
+        <div className="events container">
           {events.map(({ id, rate }, i) => (
             <Fragment key={id}>
-              <div key={id}>
+              <div key={id} className="flex gap-6">
                 <label htmlFor={id}>{`Event ${i + 1}`} </label>
                 <input
                   id={id}
@@ -117,6 +124,7 @@ const CalculatorForm = ({
                   defaultValue={Number(rate).toFixed(2)}
                 />
                 <input
+                  className="win"
                   id={`win-${id}`}
                   {...register(`events.${i}.status`)}
                   type="radio"
@@ -124,12 +132,14 @@ const CalculatorForm = ({
                   value={EStatus.WIN}
                 />
                 <input
+                  className="lose"
                   id={`lose-${id}`}
                   {...register(`events.${i}.status`)}
                   type="radio"
                   value={EStatus.LOSE}
                 />
                 <input
+                  className="draw"
                   id={`draw-${id}`}
                   {...register(`events.${i}.status`)}
                   type="radio"

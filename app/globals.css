@@ -1,3 +1,60 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+input,
+button {
+  padding: 12px 16px;
+  border: 1px solid rgb(30 41 59 / 0.7);
+  border-radius: 6px;
+}
+
+input {
+  border-radius: 4px;
+}
+
+button {
+  border-radius: 8px;
+  @apply bg-gradient-to-r from-pink-500 to-green-500 hover:from-pink-600 hover:to-green-600 text-white font-bold py-2 px-4 rounded;
+}
+
+label {
+  display: flex;
+  align-items: center;
+  color: grey;
+  font-weight: bold;
+  margin-right: 20px;
+}
+
+form.container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  align-items: center;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+input[type="radio"] {
+  @apply w-4 h-4 rounded-full;
+}
+
+input[type="radio"].win {
+  accent-color: #79ec05;
+}
+
+input[type="radio"].lose {
+  accent-color: #f40327;
+}
+
+input[type="radio"].draw {
+  accent-color: #bcc1b7;
+}
+
+.events input {
+  max-width: 100px;
+}
