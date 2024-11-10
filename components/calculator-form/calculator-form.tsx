@@ -7,7 +7,6 @@ import React, {
   SetStateAction,
   useState,
 } from "react";
-// import { isNil, isObject } from "lodash";
 
 import analyseAndCalculateCombinations from "@/utils/analyseAndCalculateCombinations/analyseAndCalculateCombinations";
 import generateInitialEvents, {
@@ -22,7 +21,7 @@ import {
   TFormState,
 } from "./model";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { isNil } from "lodash";
+import { isEmpty } from "lodash";
 
 type CalculatorFormProps = {
   selectedSystemTypeData: TSystemTypeData;
@@ -48,14 +47,17 @@ const CalculatorForm = ({
   });
 
   const eventsV = watch("events");
+  errors;
   const totalStakeV = watch("totalStake");
+  const value = watch();
   console.log(eventsV, "yyyyyy");
-  console.log(totalStakeV, "totalStakeV");
+  console.log(totalStakeV, "totalStakeV", errors);
+  console.log("errors", errors);
 
   const onSubmit = () => {
     console.log(111111, errors);
 
-    if (isNil(errors)) return errors;
+    if (!isEmpty(errors)) return errors;
 
     const data = analyseAndCalculateCombinations(
       events,
@@ -78,79 +80,117 @@ const CalculatorForm = ({
     );
   };
 
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    name: keyof TFormState
+  ) => {
+    const value =
+      e.target.value === "" ? 0 : parseFloat(e.target.value).toString();
+    setValue(name, value);
+  };
+
   const { systemType, events, totalStake } = getValues();
+
+  console.log("events", events);
 
   return (
     <>
-      <form className="container" onSubmit={handleSubmit(onSubmit)}>
+      <form noValidate className="container" onSubmit={handleSubmit(onSubmit)}>
         <div className="flex items-center">
-          <label htmlFor="systemType">System Type</label>
-          <select
-            className="block w-full px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            id="systemType"
-            {...register("systemType")}
-            onChange={handleSelectChange}
-          >
-            {systemTypes.map(({ id, from, pick }) => (
-              <option
-                key={id}
-                value={`${pick}/${from}`}
-              >{`${pick} from ${from}`}</option>
-            ))}
-          </select>
+          <label htmlFor="systemType" className="min-w-28">
+            System Type
+          </label>
+          <div className="pr-3 border border-gray-300 rounded-md bg-white">
+            <select
+              className="block w-full px-4 py-3 bg-white border-none shadow-sm focus:outline-none"
+              id="systemType"
+              {...register("systemType")}
+              onChange={handleSelectChange}
+            >
+              {systemTypes.map(({ id, from, pick }) => (
+                <option
+                  key={id}
+                  value={`${pick}/${from}`}
+                >{`${pick} from ${from}`}</option>
+              ))}
+            </select>
+          </div>
         </div>
         <div className="flex items-center">
           <label htmlFor="totalStake">Total Stake</label>
-          <input
-            {...register("totalStake")}
-            name="totalStake"
-            type="number"
-            // defaultValue={100}
-          />
-          {errors.totalStake && (
-            <div className="error-message">{errors.totalStake}</div>
-          )}
+          <div className="flex flex-col">
+            <input
+              {...register("totalStake")}
+              name="totalStake"
+              type="number"
+              onChange={(e) => handleChange(e, "totalStake")}
+            />
+
+            <div
+              className={`error-message h-6 ${
+                errors.totalStake ? "" : "invisible"
+              } text-red-600`}
+            >
+              {errors.totalStake?.message}
+            </div>
+          </div>
         </div>
         <div className="events container">
-          {events.map(({ id, rate }, i) => (
-            <Fragment key={id}>
-              <div key={id} className="flex gap-6">
-                <label htmlFor={id}>{`Event ${i + 1}`} </label>
-                <input
-                  id={id}
-                  {...register(`events.${i}.rate`)}
-                  type="number"
-                  step="0.01"
-                  defaultValue={Number(rate).toFixed(2)}
-                />
-                <input
-                  className="win"
-                  id={`win-${id}`}
-                  {...register(`events.${i}.status`)}
-                  type="radio"
-                  defaultChecked
-                  value={EStatus.WIN}
-                />
-                <input
-                  className="lose"
-                  id={`lose-${id}`}
-                  {...register(`events.${i}.status`)}
-                  type="radio"
-                  value={EStatus.LOSE}
-                />
-                <input
-                  className="draw"
-                  id={`draw-${id}`}
-                  {...register(`events.${i}.status`)}
-                  type="radio"
-                  value={EStatus.DRAW}
-                />
-              </div>
-              {errors.events && (
-                <div className="error-message">{errors.events}</div>
-              )}
-            </Fragment>
-          ))}
+          {events.map(({ id, rate }, i) => {
+            const errorIndex = errors.events?.findIndex?.(
+              (e) => e?.rate?.ref?.id === id
+            );
+            const hasError = errorIndex !== undefined && errorIndex !== -1;
+            const errorMessage = hasError
+              ? errors.events?.[errorIndex]?.rate?.message
+              : "";
+            const errorStyles = `error-message h-6 mt-2 ${
+              hasError ? "" : "invisible"
+            } text-red-600`;
+
+            return (
+              <Fragment key={id}>
+                <div>
+                  <div key={id} className="flex gap-6">
+                    <label htmlFor={id}>{`Event ${i + 1}`} </label>
+                    <input
+                      id={id}
+                      {...register(`events.${i}.rate`)}
+                      type="number"
+                      step="0.01"
+                      defaultValue={Number(rate)}
+                      onChange={(e) =>
+                        handleChange(e, e.target.name as keyof TFormState)
+                      }
+                    />
+                    <input
+                      className="win"
+                      id={`win-${id}`}
+                      {...register(`events.${i}.status`)}
+                      type="radio"
+                      defaultChecked
+                      value={EStatus.WIN}
+                    />
+                    <input
+                      className="lose"
+                      id={`lose-${id}`}
+                      {...register(`events.${i}.status`)}
+                      type="radio"
+                      value={EStatus.LOSE}
+                    />
+                    <input
+                      className="draw"
+                      id={`draw-${id}`}
+                      {...register(`events.${i}.status`)}
+                      type="radio"
+                      value={EStatus.DRAW}
+                    />
+                  </div>
+                  <div className={errorStyles}>{errorMessage}</div>
+                </div>
+              </Fragment>
+            );
+          })}
         </div>
 
         <button type="submit">Analyse</button>

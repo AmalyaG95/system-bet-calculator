@@ -6,7 +6,7 @@ import systemTypes from "@/utils/generateBetSystemTypes/generateBetSystemTypes";
 import { useState } from "react";
 
 const Home = () => {
-  const [tableData, setTableData] = useState<TResultData>();
+  const [tableData, setTableData] = useState<TResultData | undefined>();
   const [selectedSystemTypeData, setSelectedSystemTypeData] =
     useState<TSystemTypeData>(systemTypes[0]);
 
@@ -29,11 +29,11 @@ const Home = () => {
             />
             <section className="flex flex-col gap-3 font-bold">
               <h1 className="text-center">
-                Total winnings: {tableData.winningsTotalAmount}
+                Total winnings: {tableData.winningsTotalAmount.toFixed(2)}
               </h1>
-              <h1 className="text-center">Total stake: {tableData.stake}</h1>
+              <h1 className="text-center">Total stake: {Number(tableData?.stake).toFixed(2)}</h1>
               <h1 className="text-center">
-                Stake per Combination: {tableData.stakePerCombination}
+                Stake per Combination: {tableData.stakePerCombination.toFixed(2)}
               </h1>
             </section>
           </>

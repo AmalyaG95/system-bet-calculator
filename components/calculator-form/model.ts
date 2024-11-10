@@ -22,14 +22,14 @@ export const generateValidationSchema = (): yup.ObjectSchema<any> =>
     totalStake: yup
       .number()
       .required("Please enter the Total stake")
-      .min(0, "Please enter amont greater than 0"),
+      .min(1, "Please enter a positive number"),
     events: yup.array().of(
       yup.object().shape({
         id: yup.string(),
         rate: yup
           .number()
           .required("Please enter the Rate")
-          .min(1, "Please enter amont greater than 1"),
+          .min(1, "Please enter the Rate greater than 1"),
         status: yup.string().required("Please choose Event Status"),
       })
     ),

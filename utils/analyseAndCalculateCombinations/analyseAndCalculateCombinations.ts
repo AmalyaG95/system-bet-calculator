@@ -11,7 +11,6 @@ const getCombinationCount = (n: number, r: number): number => {
   return num / denom;
 };
 
-
 const analyseAndCalculateCombinations = (
   events: TEvent[],
   systemTypeX: number,
@@ -28,10 +27,21 @@ const analyseAndCalculateCombinations = (
   ): void => {
     if (currentCombo.length === systemTypeX) {
       const id = currentCombo.map((event) => event.id).join("-");
-      const winningAmount = currentCombo.reduce(
-        (acc, event) => (event.status === EStatus.WIN ? acc * event.rate : acc),
-        stakePerCombination
-      );
+
+      // Calculate winning amount based only on events with a "WIN" status
+      let winningAmount = stakePerCombination;
+      let hasWin = false;
+
+      currentCombo.forEach((event) => {
+        if (event.status === EStatus.WIN) {
+          winningAmount *= event.rate;
+          hasWin = true;
+        }
+      });
+
+      // If no winning events were found in the combination, set winningAmount to zero
+      winningAmount = hasWin ? winningAmount : 0;
+
       combinations.push({
         id,
         events: [...currentCombo],
