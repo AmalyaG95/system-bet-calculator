@@ -1,4 +1,4 @@
-import analyseAndCalculateCombinations from "./analyseAndCalculateCombinations";
+import { analyzeAndCalculateCombinations } from "..";
 import { EStatus } from "../generateInitialEvents/generateInitialEvents";
 
 // Sample events for tests
@@ -13,14 +13,14 @@ describe("System Bet Calculator Core Functionality Tests", () => {
   describe("Combination Generation", () => {
     it("should generate the correct number of 2/3 combinations", () => {
       const events = sampleEvents.slice(0, 3); // Using 3 events
-      const result = analyseAndCalculateCombinations(events, 2, 100);
+      const result = analyzeAndCalculateCombinations(events, 2, 100);
 
       // Expected combinations for 3 events taken 2 at a time is 3
       expect(result.combinations.length).toBe(3);
     });
 
     it("should generate the correct number of 3/4 combinations", () => {
-      const result = analyseAndCalculateCombinations(sampleEvents, 3, 100);
+      const result = analyzeAndCalculateCombinations(sampleEvents, 3, 100);
 
       // Expected combinations for 4 events taken 3 at a time is 4
       expect(result.combinations.length).toBe(4);
@@ -33,9 +33,9 @@ describe("System Bet Calculator Core Functionality Tests", () => {
         ...event,
         status: EStatus.WIN,
       }));
-      const result = analyseAndCalculateCombinations(allWinningEvents, 2, 100);
+      const result = analyzeAndCalculateCombinations(allWinningEvents, 2, 100);
 
-      result.combinations.forEach((combo) => {
+      result.combinations.forEach((combo: TCombination) => {
         let expectedWinningAmount = result.stakePerCombination;
         combo.events.forEach((event) => {
           expectedWinningAmount *= event.rate;
@@ -45,10 +45,10 @@ describe("System Bet Calculator Core Functionality Tests", () => {
     });
 
     it("should correctly calculate payouts for some winning and some losing events", () => {
-      const result = analyseAndCalculateCombinations(sampleEvents, 2, 100);
+      const result = analyzeAndCalculateCombinations(sampleEvents, 2, 100);
 
       let expectedTotalWinnings = 0;
-      result.combinations.forEach((combo) => {
+      result.combinations.forEach((combo: TCombination) => {
         let winningAmount = result.stakePerCombination;
         combo.events.forEach((event) => {
           if (event.status === EStatus.WIN) winningAmount *= event.rate;
@@ -64,10 +64,10 @@ describe("System Bet Calculator Core Functionality Tests", () => {
         ...event,
         status: EStatus.LOSE,
       }));
-      const result = analyseAndCalculateCombinations(allLosingEvents, 2, 100);
+      const result = analyzeAndCalculateCombinations(allLosingEvents, 2, 100);
 
       expect(result.winningsTotalAmount).toBe(0);
-      result.combinations.forEach((combo) => {
+      result.combinations.forEach((combo: TCombination) => {
         expect(combo.winningAmount).toBe(0);
       });
     });

@@ -7,4 +7,7 @@ type TSetStringOrNull = Dispatch<SetStateAction<string | null>>;
 
 type TMouseEvent = MouseEvent<HTMLButtonElement, MouseEvent>;
 type TChangeEvent = React.ChangeEvent<HTMLInputElement>;
+type THandleChangeEvent = (
+  event: ChangeEvent<HTMLSelectElement & HTMLInputElement>
+) => void;
 type TSetGlobalState = Dispatch<SetStateAction<State>>;

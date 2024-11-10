@@ -16,7 +16,7 @@ export const generateInitialValues = (
   events: generateInitialEvents(systemType.from),
 });
 
-export const generateValidationSchema = (): yup.ObjectSchema<any> =>
+export const generateValidationSchema = (): yup.ObjectSchema<TFormState> =>
   yup.object({
     systemType: yup.string(),
     totalStake: yup
@@ -33,4 +33,4 @@ export const generateValidationSchema = (): yup.ObjectSchema<any> =>
         status: yup.string().required("Please choose Event Status"),
       })
     ),
-  });
+  }) as yup.ObjectSchema<TFormState>;;

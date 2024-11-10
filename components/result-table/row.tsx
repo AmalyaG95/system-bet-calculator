@@ -8,29 +8,29 @@ type RowProps = {
   winningAmount: number;
 };
 
-const Row = ({ index, id, events, winningAmount }: RowProps) => {
-  return (
-    <div className="flex gap-3 border-blue-400">
-      <span className=" w-48 text-center">{index + 1}</span>
-      <span className=" w-48 text-center">{id}</span>
-      {events.map(({ id, rate, status }) => (
-        <span
-          key={id}
-          className={`w-48 text-center ${
-            status === EStatus.WIN
-              ? "text-lime-600"
-              : status === EStatus.LOSE
-              ? "text-red-600"
-              : "text-slate-400"
-          }`}
-        >
-          {Number(rate)?.toFixed(2)}
-        </span>
-      ))}
-      <span className=" w-48 text-center">{getTotalRate(events)}</span>
-      <span className=" w-48 text-center">{winningAmount.toFixed(2)}</span>
-    </div>
-  );
-};
+const rowStyles = 'w-48 text-center';
+
+const Row = ({ index, id, events, winningAmount }: RowProps) => (
+  <div className="flex gap-3 border-blue-400">
+    <span className={`${rowStyles}`}>{index + 1}</span>
+    <span className={`${rowStyles}`}>{id}</span>
+    {events.map(({ id, rate, status }) => (
+      <span
+        key={id}
+        className={`${rowStyles} ${
+          status === EStatus.WIN
+            ? "text-lime-600"
+            : status === EStatus.LOSE
+            ? "text-red-600"
+            : "text-slate-400"
+        }`}
+      >
+        {Number(rate)?.toFixed(2)}
+      </span>
+    ))}
+    <span className={`${rowStyles}`}>{getTotalRate(events)}</span>
+    <span className={`${rowStyles}`}>{winningAmount.toFixed(2)}</span>
+  </div>
+);
 
 export default Row;

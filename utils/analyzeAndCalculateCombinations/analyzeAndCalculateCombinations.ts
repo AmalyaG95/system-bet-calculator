@@ -11,7 +11,7 @@ const getCombinationCount = (n: number, r: number): number => {
   return num / denom;
 };
 
-const analyseAndCalculateCombinations = (
+const analyzeAndCalculateCombinations = (
   events: TEvent[],
   systemTypeX: number,
   stake: number
@@ -70,4 +70,4 @@ const analyseAndCalculateCombinations = (
   };
 };
 
-export default analyseAndCalculateCombinations;
+export default analyzeAndCalculateCombinations;
